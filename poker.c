@@ -27,8 +27,6 @@ struct card
 
 	// clubs = 0, diamonds = 1, spades = 2, hearts = 3
 	int suit;
-
-    int valueInDeck; // 0 - 51
 };
 
 // boolean function that checks if card passed has already been drawn
@@ -49,20 +47,22 @@ void drawCards(struct card hand[], int n)
 {
 	srand(time(NULL));
 
+	int valueInDeck;
+
     for (int i = 0; i < n; i++)
     {
         // first pick a random number from 0 to 51
         do
         {
-            hand[i].valueInDeck = rand() % 52;
+            valueInDeck = rand() % 52;
         }
-        while (cardAlreadyDrawn(hand[i].valueInDeck, pickedCards));
+        while (cardAlreadyDrawn(valueInDeck, pickedCards));
 
         // provide numbered card value (Ace to King)
-        hand[i].value = hand[i].valueInDeck % 13;
+        hand[i].value = valueInDeck % 13;
         
         // provide numbered suit value (clubs to hearts)
-		hand[i].suit = hand[i].valueInDeck / 13;
+		hand[i].suit = valueInDeck / 13;
     }
 
 }
@@ -282,7 +282,7 @@ void versionTwo(struct card userHand[], struct card compHand[])
 	do
 	{
 		for (int i = 0; i < 52; i++)
-			pickedCards[i] == 0;
+			pickedCards[i] = 0;
 
 		system("cls");
 
