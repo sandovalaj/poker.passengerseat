@@ -11,6 +11,9 @@ char suits[4][20] = {
 	{"Hearts\0"}
 };
 
+// royal flush cards
+int royal[5] = {12, 11, 10, 9, 0};
+
 // array of already drawn cards
 // no card is set default to 0, 
 // while drawn card is set to 1.
@@ -119,7 +122,6 @@ void printCards(struct card hand[])
 	return;
 }
 
-<<<<<<< HEAD
 //CATEGORY FUNCTIONS START HERE--------------------------------------------------------------------------------
 /*
 	valueCat -> returns 0 - 5 where
@@ -131,85 +133,6 @@ void printCards(struct card hand[])
 	5 = full house
 */
 int valueCat(struct card userHand[])
-=======
-/*
-// function that returns int of 2 - 6 based on how many cards
-// of the same rank is in the hand passed.
-// returns 0 if found none, 5 if there are two pairs, 6 if there is a full house
-int sameRanks(struct card hand[], int n)
-{
-	// stores number of cards with the same rank
-	// 0 - 1st card, 1 - 2nd card, ...
-	int cardNo[n];
-
-	for (int i = 0; i < n; i++)
-	{
-		// to count appearance of card in hand
-		int timesAppeared = 0;
-
-		for (int j = 0; j < n; j++)
-		{
-			if (hand[i].value == hand[j].value)
-				timesAppeared++;
-		}
-
-		cardNo[i] = timesAppeared;
-	}
-
-	int max = 0;
-	for (int i = 0; i < n; i++)
-	{
-		if (cardNo[i] > max)
-			max = cardNo[i];
-	}
-
-	// check for full house
-	// 3 cards that have 3 occurrences and 2 cards that have 2 occurences
-	// if max is 3, there's definitely already 3 cards that have 3 occurrences,
-	// so the only thing left to do is to check if there are 2 cards that have
-	// 2 occurences
-	if (max == 3)
-	{
-		int noOfPairs = 0;
-
-		for (int i = 0; i < n; i++)
-		{
-			if (cardNo[i] == 2)
-				noOfPairs++;
-		}
-
-		if (noOfPairs == 2)
-			return 6;
-	}
-
-	// check if there are 4 cards that have 2 occurences
-	else if (max == 2)
-	{
-		int noOfPairs = 0;
-		for (int i = 0; i < n; i++)
-		{
-			if (cardNo[i] == 2)
-				noOfPairs++;
-		}
-
-		if (noOfPairs == 4)
-			return 5;
-	}
-
-	// return max value if all else fails
-	if (max != 0)
-		return max;
-	
-	// return 0 for no occurences
-	return 0;
-}
-
-*/
-
-
-/*
-int catValue(int i, int j, int pair, int pThree)
->>>>>>> pokerModif
 {
 	int valueBool[14] = {0};
 	
@@ -222,17 +145,11 @@ int catValue(int i, int j, int pair, int pThree)
 	for (int a = 0; a < 14; a++)
 	{
 		if (valueBool[a] == 2)
-		{
 			ret += 2;
-		}
 		else if (valueBool[a] == 3)
-		{
 			ret += 3;
-		}
 		else if (valueBool[a] == 4)
-		{
 			ret += 1;
-		}
 	}
 
 	return ret;
@@ -245,9 +162,7 @@ bool straightCat(struct card userHand[])
 	{
 		temp = userHand[a].value;
 		if (temp - 1 != userHand[a + 1].value)
-		{
 			return false;
-		}
 	}
 	
 	return true;
@@ -259,24 +174,37 @@ bool flushCat(struct card userHand[])
 	for (int a = 1; a < 5; a++)
 	{
 		if (temp != userHand[a].suit)
-		{
 			return false;
-		}
 	}
 	
 	return true;
 }
 
+bool royalFlushCat(struct card hand[])
+{
+	if (flushCat)
+	{
+		for (int i = 0; i < 5; i++)
+			if (hand[i].value != royal[i])
+				return false;
+		
+		return true;
+	}
+
+	return false;
+}
+
 	//SORTS CARDS BY CATEGORY
 void category(struct card userHand[])
 {	
-	bool pair1 = false;						//two values
-	bool pair2 = false;						//two values, two values
-	bool three = false;						//three values
-	bool four = false;						//four values
-	bool straight = straightCat(userHand);	//consec values
-	bool flush = flushCat(userHand);		//same suit all
-	bool full = false;						//three and pair1 or pair2
+	bool pair1 = false;								//two values
+	bool pair2 = false;								//two values, two values
+	bool three = false;								//three values
+	bool four = false;								//four values
+	bool straight = straightCat(userHand);			//consec values
+	bool flush = flushCat(userHand);				//same suit all
+	bool royalflush = royalFlushCat(userHand);		//royal
+	bool full = false;								//three and pair1 or pair2
 	
 	switch (valueCat(userHand)) 
 	{
@@ -297,17 +225,18 @@ void category(struct card userHand[])
 			break;
 	}
 	
-	
-	if (flush && straight)
-		printf("\nStraight and Flush\n");
+	if (royalflush)
+		printf("\nRoyal Flush\n");
+	else if (flush && straight)
+		printf("\nStraight Flush\n");
+	else if (four)
+		printf("\nFour of a kind\n");
 	else if (full)
 		printf("\nFull House\n");
 	else if (flush)
 		printf("\nFlush\n");
 	else if (straight)
 		printf("\nStraight\n");
-	else if (four)
-		printf("\nFour of a kind\n");
 	else if (three)
 		printf("\nThree of a kind\n");
 	else if (pair2)
@@ -319,11 +248,7 @@ void category(struct card userHand[])
 	
 	return;
 }
-<<<<<<< HEAD
 //CATEGORY FUNCTIONS END HERE--------------------------------------------------------------------------------
-=======
-*/
->>>>>>> pokerModif
 
 int main()
 {
@@ -336,12 +261,8 @@ int main()
 	sort(userHand, 5);
 
 	printCards(userHand);
-<<<<<<< HEAD
 	
 	category(userHand);
 	
-=======
-		
->>>>>>> pokerModif
 	return 0;
 }
