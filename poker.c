@@ -119,6 +119,79 @@ void printCards(struct card hand[])
 	return;
 }
 
+// function that returns int of 2 - 6 based on how many cards
+// of the same rank is in the hand passed.
+// returns 0 if found none, 5 if there are two pairs, 6 if there is a full house
+int sameRanks(struct card hand[], int n)
+{
+	// stores number of cards with the same rank
+	// 0 - 1st card, 1 - 2nd card, ...
+	int cardNo[n];
+
+	for (int i = 0; i < n; i++)
+	{
+		// to count appearance of card in hand
+		int timesAppeared = 0;
+
+		for (int j = 0; j < n; j++)
+		{
+			if (hand[i].value == hand[j].value)
+				timesAppeared++;
+		}
+
+		cardNo[i] = timesAppeared;
+	}
+
+	int max = 0;
+	for (int i = 0; i < n; i++)
+	{
+		if (cardNo[i] > max)
+			max = cardNo[i];
+	}
+
+	// check for full house
+	// 3 cards that have 3 occurrences and 2 cards that have 2 occurences
+	// if max is 3, there's definitely already 3 cards that have 3 occurrences,
+	// so the only thing left to do is to check if there are 2 cards that have
+	// 2 occurences
+	if (max == 3)
+	{
+		int noOfPairs = 0;
+
+		for (int i = 0; i < n; i++)
+		{
+			if (cardNo[i] == 2)
+				noOfPairs++;
+		}
+
+		if (noOfPairs == 2)
+			return 6;
+	}
+
+	// check if there are 4 cards that have 2 occurences
+	else if (max == 2)
+	{
+		int noOfPairs = 0;
+		for (int i = 0; i < n; i++)
+		{
+			if (cardNo[i] == 2)
+				noOfPairs++;
+		}
+
+		if (noOfPairs == 4)
+			return 5;
+	}
+
+	// return max value if all else fails
+	if (max != 0)
+		return max;
+	
+	// return 0 for no occurences
+	return 0;
+}
+
+
+/*
 int catValue(int i, int j, int pair, int pThree)
 {
 	int n = 0;
@@ -258,9 +331,12 @@ void category()
 	
 	return;
 }
+*/
 
 int main()
 {
+	system("cls");
+
 	struct card userHand[5];
 
 	drawCards(userHand, 5);
@@ -268,6 +344,20 @@ int main()
 	sort(userHand, 5);
 
 	printCards(userHand);
+
+	int pairs = sameRanks(userHand, 5);
+
+	if (pairs == 4)
+		printf("\nFour of a Kind!");
+	else if (pairs == 6)
+		printf("\nFull House!");
+	else if (pairs == 3)
+		printf("\nThree of a Kind!");
+	else if (pairs == 5)
+		printf("\nTwo Pairs!");
+	else if (pairs == 2)
+		printf("\nOne Pair!");
+		
 	
 	return 0;
 }
