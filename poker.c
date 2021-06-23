@@ -119,68 +119,53 @@ void printCards(struct card hand[])
 	return;
 }
 
-int catValue(int i, int j, int pair, int pThree)
+//CATEGORY FUNCTIONS START HERE--------------------------------------------------------------------------------
+/*
+	valueCat -> returns 0 - 5 where
+	0 = nothing
+	1 = four of a kind
+	2 = one pair
+	3 = three of a kind
+	4 = two pairs
+	5 = full house
+*/
+int valueCat(struct card userHand[])
 {
-	int n = 0;
-	int temp; 
-	for (int a = i; a < 5; a++)
+	int valueBool[14] = {0};
+	
+	for (int a = 0; a < 5; a++)
 	{
-		temp = sortedValues[a].value;
-		n++;
-		
-		for (int b = j; b < 5; b++)
-		{
-			if (a != b && temp == sortedValues[b].value)
-			{
-				n++;
-			}
-		}
-		
-		if (n == 2)
-		{
-			if (pair == 2)
-			{
-				return 1;
-			}
-			
-			if (pThree == 1)
-			{
-				return 2;
-			}
-			
-			pair++;
-			return catValue(a + 1, a + 2, pair, pThree) + 1;
-		}
-		else if (n == 3)
-		{
-			if (pair == 1)
-			{
-				return 3;
-			}
-			
-			pThree++;
-			return catValue(a + 1, a + 3, pair, pThree) + 3;
-		}
-		else if (n == 4)
-		{
-			return 4;
-		}
-		
-		n = 0;
+		valueBool[userHand[a].value]++;
 	}
 	
-	return 0;
+	int ret = 0;
+	for (int a = 0; a < 14; a++)
+	{
+		if (valueBool[a] == 2)
+		{
+			ret += 2;
+		}
+		else if (valueBool[a] == 3)
+		{
+			ret += 3;
+		}
+		else if (valueBool[a] == 4)
+		{
+			ret += 1;
+		}
+	}
+
+	return ret;
 }
 
-bool straightCat()
+bool straightCat(struct card userHand[])
 {
 	int temp;
 	for (int a = 0; a < 4; a++)
 	{
-		temp = sortedValues[a].value;
-		if (temp + 1 != sortedValues[a + 1].value)
+		temp = userHand[a].value;
+		if (temp - 1 != userHand[a + 1].value)
 		{
-			//printf("%d != %d", temp, sortedSuits[a].suit);
 			return false;
 		}
 	}
@@ -188,14 +173,13 @@ bool straightCat()
 	return true;
 }
 
-bool flushCat()
+bool flushCat(struct card userHand[])
 {
-	int temp = sortedSuits[0].suit;
+	int temp = userHand[0].suit;
 	for (int a = 1; a < 5; a++)
 	{
-		if (temp != sortedSuits[a].suit)
+		if (temp != userHand[a].suit)
 		{
-			//printf("%d != %d", temp, sortedSuits[a].suit);
 			return false;
 		}
 	}
@@ -204,30 +188,29 @@ bool flushCat()
 }
 
 	//SORTS CARDS BY CATEGORY
-void category()
+void category(struct card userHand[])
 {	
-	bool pair1 = false;				//two values
-	bool pair2 = false;				//two values, two values
-	bool three = false;				//three values
-	bool four = false;				//four values
-	bool straight = straightCat();	//consec values
-	bool flush = flushCat();		//same suit all
-	bool full = false;				//three and pair1 or pair2
+	bool pair1 = false;						//two values
+	bool pair2 = false;						//two values, two values
+	bool three = false;						//three values
+	bool four = false;						//four values
+	bool straight = straightCat(userHand);	//consec values
+	bool flush = flushCat(userHand);		//same suit all
+	bool full = false;						//three and pair1 or pair2
 	
-	int v = catValue(0, 0, 0, 0);
-	switch (v) 
+	switch (valueCat(userHand)) 
 	{
 		case 1:
-			pair1 = true;
+			four = true;
 			break;
 		case 2:
-			pair2 = true;
+			pair1 = true;
 			break;
 		case 3:
 			three = true;
 			break;
 		case 4:
-			four = true;
+			pair2 = true;
 			break;
 		case 5:
 			full = true;
@@ -236,28 +219,27 @@ void category()
 	
 	
 	if (flush && straight)
-		printf("Straight and Flush\n");
+		printf("\nStraight and Flush\n");
 	else if (full)
-		printf("Full\n");
+		printf("\nFull House\n");
 	else if (flush)
-		printf("Flush\n");
+		printf("\nFlush\n");
 	else if (straight)
-		printf("Straight\n");
+		printf("\nStraight\n");
 	else if (four)
-		printf("Four of a kind\n");
+		printf("\nFour of a kind\n");
 	else if (three)
-		printf("Three of a kind\n");
+		printf("\nThree of a kind\n");
 	else if (pair2)
-		printf("Two pairs\n");
+		printf("\nTwo pairs\n");
 	else if (pair1)
-		printf("One pair\n");
+		printf("\nOne pair\n");
 	else
-		printf("Nothing\n");
-	
-	//printf(" %d\n", v);
+		printf("\nNothing\n");
 	
 	return;
 }
+//CATEGORY FUNCTIONS END HERE--------------------------------------------------------------------------------
 
 int main()
 {
@@ -268,6 +250,8 @@ int main()
 	sort(userHand, 5);
 
 	printCards(userHand);
+	
+	category(userHand);
 	
 	return 0;
 }
