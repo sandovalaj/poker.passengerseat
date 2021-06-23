@@ -302,7 +302,7 @@ int main()
 		else
 			while (1)
 			{
-				printf("\033c");
+				system("cls");
 
 				struct card userHand[5];
 				struct card compHand[5];

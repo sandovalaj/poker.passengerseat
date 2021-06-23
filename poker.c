@@ -11,6 +11,9 @@ char suits[4][20] = {
 	{"Hearts\0"}
 };
 
+// royal flush cards
+int royal[5] = {12, 11, 10, 9, 0};
+
 // array of already drawn cards
 // no card is set default to 0, 
 // while drawn card is set to 1.
@@ -142,17 +145,11 @@ int valueCat(struct card userHand[])
 	for (int a = 0; a < 14; a++)
 	{
 		if (valueBool[a] == 2)
-		{
 			ret += 2;
-		}
 		else if (valueBool[a] == 3)
-		{
 			ret += 3;
-		}
 		else if (valueBool[a] == 4)
-		{
 			ret += 1;
-		}
 	}
 
 	return ret;
@@ -165,9 +162,7 @@ bool straightCat(struct card userHand[])
 	{
 		temp = userHand[a].value;
 		if (temp - 1 != userHand[a + 1].value)
-		{
 			return false;
-		}
 	}
 	
 	return true;
@@ -179,24 +174,37 @@ bool flushCat(struct card userHand[])
 	for (int a = 1; a < 5; a++)
 	{
 		if (temp != userHand[a].suit)
-		{
 			return false;
-		}
 	}
 	
 	return true;
 }
 
+bool royalFlushCat(struct card hand[])
+{
+	if (flushCat)
+	{
+		for (int i = 0; i < 5; i++)
+			if (hand[i].value != royal[i])
+				return false;
+		
+		return true;
+	}
+
+	return false;
+}
+
 	//SORTS CARDS BY CATEGORY
 void category(struct card userHand[])
 {	
-	bool pair1 = false;						//two values
-	bool pair2 = false;						//two values, two values
-	bool three = false;						//three values
-	bool four = false;						//four values
-	bool straight = straightCat(userHand);	//consec values
-	bool flush = flushCat(userHand);		//same suit all
-	bool full = false;						//three and pair1 or pair2
+	bool pair1 = false;								//two values
+	bool pair2 = false;								//two values, two values
+	bool three = false;								//three values
+	bool four = false;								//four values
+	bool straight = straightCat(userHand);			//consec values
+	bool flush = flushCat(userHand);				//same suit all
+	bool royalflush = royalFlushCat(userHand);		//royal
+	bool full = false;								//three and pair1 or pair2
 	
 	switch (valueCat(userHand)) 
 	{
@@ -217,17 +225,18 @@ void category(struct card userHand[])
 			break;
 	}
 	
-	
-	if (flush && straight)
-		printf("\nStraight and Flush\n");
+	if (royalflush)
+		printf("\nRoyal Flush\n");
+	else if (flush && straight)
+		printf("\nStraight Flush\n");
+	else if (four)
+		printf("\nFour of a kind\n");
 	else if (full)
 		printf("\nFull House\n");
 	else if (flush)
 		printf("\nFlush\n");
 	else if (straight)
 		printf("\nStraight\n");
-	else if (four)
-		printf("\nFour of a kind\n");
 	else if (three)
 		printf("\nThree of a kind\n");
 	else if (pair2)
@@ -243,15 +252,41 @@ void category(struct card userHand[])
 
 int main()
 {
-	struct card userHand[5];
+	while (1)
+	{
+		printf("1 - Play\n");
+		printf("2 - Exit\n");
+		printf("Select: ");
+		
+		int menu;
+		scanf("%d", &menu);
+		
+		if (menu == 2)
+			return 0;
+		else
+			while (1)
+			{
+				system("cls");
 
-	drawCards(userHand, 5);
+				struct card userHand[5];
 
-	sort(userHand, 5);
+				drawCards(userHand, 5);
 
-	printCards(userHand);
+				sort(userHand, 5);
+
+				printCards(userHand);
 	
-	category(userHand);
-	
+				category(userHand);
+		
+				char again[2];
+				
+				printf("\n\nWant to play again? y/n		");
+				scanf("%s", again);
+			
+				if (again[0] == 'n')
+					break;
+			}
+		
+	}
 	return 0;
 }
