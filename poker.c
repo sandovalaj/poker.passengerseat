@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdbool.h>
 
+// suit strings
 char suits[4][20] = {
 	{"Clubs\0"},
 	{"Diamonds\0"},
@@ -29,55 +30,6 @@ struct card
 struct card cards[5];
 struct card sortedSuits[5];
 struct card sortedValues[5];
-
-	//ENSURES FIVE DRAWN CARDS WILL NOT HAVE REPEATING CARDS
-bool checker(int s, int v, int a)
-{
-	for (int i = 0; i < a; i++)
-	{
-		if (cards[i].value == v)
-		{
-			if (cards[i].suit == s)
-			{
-				return false;
-			}
-		}
-	}
-	
-	return true; //if no duplicate
-}
-
-/*
-	//DRAWS FIVE CARDS AT A TIME
-void drawCards()
-{
-	srand(time(NULL));
-	for (int a = 0; a < 5; a++)
-	{
-		int n = rand() % 14;
-		if (n == 9 || n == 10)
-		{
-			cards[a].value = 9;
-		}
-		else
-		{
-			cards[a].value = n;
-		}
-		
-		while (1)
-		{
-			n = rand() % 4;
-			if (checker(n, cards[a].value, a))
-			{
-				cards[a].suit = n;
-				break;
-			}
-		}
-	}
-	
-	return;
-}
-*/
 
 // boolean function that checks if card passed has already been drawn
 // takes in value of card with respect to whole deck and checks if it is
@@ -110,113 +62,43 @@ void drawCards(struct card hand[], int n)
         hand[i].value = hand[i].valueInDeck % 13;
         
         // provide numbered suit value (clubs to hearts)
-		hand[i].suit = hand[i].valueInDeck % 4;
+		hand[i].suit = hand[i].valueInDeck / 13;
     }
 
 }
 
-	//SORTING OF CARDS BY SUITS AND VALUES
-bool sortChecker(struct card array[], int n)
-{
-	for (int a = 0; a < n; a++)
-	{
-		if (array[a].value > array[a + 1].value)
-		{
-			return false;
-		}
-	}
-	
-	return true;
-}
-
-void bubble(struct card array[], int index, int n)
+// sort cards in indicated hand in descending order
+void sort(struct card hand[], int n)
 {	
 	struct card temp;
-	
-	if (array[index].value > array[index + 1].value)
-	{
-		temp = array[index];
-		array[index] = array[index + 1];
-		array[index + 1] = temp;
-	}
-		
-	if (index + 1 >= n)
-	{
-		return;
-	}
-	
-	bubble(array, index + 1, n);
-	
-	return;
-}
 
-void sort()
-{
-	//SORT ACCORDING TO SUITS
-	
-	struct card tempRed[5];
-	struct card tempBlack[5];
-	
-	int i = 0;
-	for (int a = 0; a < 5; a++)
+	for (int i = 0; i < n; i++)
 	{
-		if (cards[a].suit % 2 == 0)
+		int max = hand[i].value;
+		int location;
+		bool found = false;
+
+		for (int j = i + 1; j < n; j++)
 		{
-			tempBlack[i] = cards[a];
-			i++;
+			if (hand[j].value > max)
+			{
+				max = hand[j].value;
+				location = j;
+				found = true;
+			}
+		}
+
+		if (found)
+		{
+			temp = hand[location];
+			hand[location] = hand[i];
+			hand[i] = temp;
 		}
 	}
-	
-	int j = 0;
-	for (int a = 0; a < 5; a++)
-	{
-		if (cards[a].suit % 2 != 0)
-		{
-			tempRed[j] = cards[a];
-			j++;
-		}
-	}
-
-	struct card temp;
-	
-	
-	while (!sortChecker(tempBlack, i - 1))
-	{
-		bubble(tempBlack, 0, i - 1);
-	}
-	
-	while (!sortChecker(tempRed, j - 1))
-	{
-		bubble(tempRed, 0, j - 1);
-	}
-	
-	for (int a = 0; a < i; a++)
-	{
-		sortedSuits[a] = tempBlack[a];
-	}
-	
-	for (int a = 0; a < j; a++)
-	{
-		sortedSuits[i] = tempRed[a];
-		i++;
-	}
-	
-	//SORT ACCORDING TO VALUES ONLY
-	
-	for (int a = 0; a < 5; a++)
-	{
-		sortedValues[a] = cards[a];
-	}
-	
-	while (!sortChecker(sortedValues, 4))
-	{
-		bubble(sortedValues, 0, 4);
-	}
-
-	return;
 }
 
-	//PRINTS CARDS BY MATCHING INTS TO KEY (suits, values)
+// void function that loops through card hand and prints
+// cards according to their value and suit
 void printCards(struct card hand[])
 {
 	for (int a = 0; a < 5; a++)
@@ -381,8 +263,9 @@ int main()
 {
 	struct card userHand[5];
 
-	for (int i = 0; i < 5; i++)
-		drawCards(userHand, 5);
+	drawCards(userHand, 5);
+
+	sort(userHand, 5);
 
 	printCards(userHand);
 	
