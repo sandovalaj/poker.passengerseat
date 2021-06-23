@@ -119,6 +119,7 @@ void printCards(struct card hand[])
 	return;
 }
 
+/*
 // function that returns int of 2 - 6 based on how many cards
 // of the same rank is in the hand passed.
 // returns 0 if found none, 5 if there are two pairs, 6 if there is a full house
@@ -189,6 +190,8 @@ int sameRanks(struct card hand[], int n)
 	// return 0 for no occurences
 	return 0;
 }
+
+*/
 
 
 /*
@@ -344,20 +347,6 @@ int main()
 	sort(userHand, 5);
 
 	printCards(userHand);
-
-	int pairs = sameRanks(userHand, 5);
-
-	if (pairs == 4)
-		printf("\nFour of a Kind!");
-	else if (pairs == 6)
-		printf("\nFull House!");
-	else if (pairs == 3)
-		printf("\nThree of a Kind!");
-	else if (pairs == 5)
-		printf("\nTwo Pairs!");
-	else if (pairs == 2)
-		printf("\nOne Pair!");
 		
-	
 	return 0;
 }
