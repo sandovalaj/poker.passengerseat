@@ -72,8 +72,7 @@ void drawCards(struct card hand[], int n)
         do
         {
             valueInDeck = rand() % 52;
-        }
-        while (cardAlreadyDrawn(valueInDeck, pickedCards));
+        } while (cardAlreadyDrawn(valueInDeck, pickedCards));
 
         // provide numbered card value (Ace to King)
         hand[i].value = valueInDeck % 13;
@@ -97,6 +96,9 @@ void drawChoiceCard(struct card hand[], int n)
 		{
 			system("cls");
 
+			if (currentCard > 0)
+				printf("Previous card was: %s of %s\n", cards[hand[currentCard - 1].value], suits[hand[currentCard - 1].suit]);
+			
 			printf("This is your card %d\n\n", currentCard + 1);
 			printf("Pick a suit!\n");
 			printf("1 - Clubs\n");
@@ -106,8 +108,7 @@ void drawChoiceCard(struct card hand[], int n)
 
 			printf("Enter choice: ");
 			scanf(" %d", &suitChoice);
-		} 
-		while (suitChoice > 4 || suitChoice < 1);
+		} while (suitChoice > 4 || suitChoice < 1);
 
 		do
 		{
@@ -261,33 +262,9 @@ bool royalFlushCat(struct card hand[])
 	//SORTS CARDS BY CATEGORY
 int category(struct card userHand[])
 {	
-	bool pair1 = false;								//two values
-	bool pair2 = false;								//two values, two values
-	bool three = false;								//three values
-	bool four = false;								//four values
 	bool straight = straightCat(userHand);			//consec values
 	bool flush = flushCat(userHand);				//same suit all
 	bool royalflush = royalFlushCat(userHand);		//royal
-	bool full = false;								//three and pair1 or pair2
-	
-	switch (valueCat(userHand)) 
-	{
-		case 1:
-			four = true;
-			break;
-		case 2:
-			pair1 = true;
-			break;
-		case 3:
-			three = true;
-			break;
-		case 4:
-			pair2 = true;
-			break;
-		case 5:
-			full = true;
-			break;
-	}
 	
 	if (royalflush)
 	{
@@ -299,12 +276,12 @@ int category(struct card userHand[])
 		printf("\nStraight Flush\n");
 		return 8;
 	}
-	else if (four)
+	else if (valueCat(userHand) == 7)
 	{
 		printf("\nFour of a kind\n");
 		return 7;
 	}
-	else if (full)
+	else if (valueCat(userHand) == 6)
 	{
 		printf("\nFull House\n");
 		return 6;
@@ -319,17 +296,17 @@ int category(struct card userHand[])
 		printf("\nStraight\n");
 		return 4;
 	}
-	else if (three)
+	else if (valueCat(userHand) == 3)
 	{
 		printf("\nThree of a kind\n");
 		return 3;
 	}
-	else if (pair2)
+	else if (valueCat(userHand) == 2)
 	{
 		printf("\nTwo pairs\n");
 		return 2;
 	}
-	else if (pair1)
+	else if (valueCat(userHand) == 1)
 	{
 		printf("\nOne pair\n");
 		return 1;
@@ -453,8 +430,7 @@ int showMenu(struct card hand1[], struct card hand2[])
 
 			printf("Enter choice: ");
 			scanf(" %d", &userChoice);
-		} 
-		while (userChoice > 3 || userChoice < 1);
+		} while (userChoice > 3 || userChoice < 1);
 
 		if (userChoice == 3)
 		{
