@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 // suit strings
 char suits[4][20] = {
@@ -9,6 +10,23 @@ char suits[4][20] = {
 	{"Diamonds\0"},
 	{"Spades\0"},
 	{"Hearts\0"}
+};
+
+// card strings
+char cards[13][10] = {
+	{"Ace\0"},
+	{"Two\0"},
+	{"Three\0"},
+	{"Four\0"},
+	{"Five\0"},
+	{"Six\0"},
+	{"Seven\0"},
+	{"Eight\0"},
+	{"Nine\0"},
+	{"Ten\0"},
+	{"Jack\0"},
+	{"Queen\0"},
+	{"King\0"}
 };
 
 // royal flush cards
@@ -26,13 +44,7 @@ struct card
 
 	// clubs = 0, diamonds = 1, spades = 2, hearts = 3
 	int suit;
-
-    int valueInDeck; // 0 - 51
 };
-
-struct card cards[5];
-struct card sortedSuits[5];
-struct card sortedValues[5];
 
 // boolean function that checks if card passed has already been drawn
 // takes in value of card with respect to whole deck and checks if it is
@@ -52,22 +64,84 @@ void drawCards(struct card hand[], int n)
 {
 	srand(time(NULL));
 
+	int valueInDeck;
+
     for (int i = 0; i < n; i++)
     {
         // first pick a random number from 0 to 51
         do
         {
-            hand[i].valueInDeck = rand() % 52;
-        }
-        while (cardAlreadyDrawn(hand[i].valueInDeck, pickedCards));
+            valueInDeck = rand() % 52;
+        } while (cardAlreadyDrawn(valueInDeck, pickedCards));
 
         // provide numbered card value (Ace to King)
-        hand[i].value = hand[i].valueInDeck % 13;
+        hand[i].value = valueInDeck % 13;
         
         // provide numbered suit value (clubs to hearts)
-		hand[i].suit = hand[i].valueInDeck / 13;
+		hand[i].suit = valueInDeck / 13;
     }
+}
 
+// bool function that draws single card chosen out of whole deck
+bool drawChoiceCard(struct card hand[], int n)
+{
+	int currentCard = 0;
+	int suitChoice  = 0;
+	int cardChoice  = 0;
+
+	while (currentCard < 5 && suitChoice != 5)
+	{
+		do
+		{
+			system("cls");
+
+			if (currentCard > 0)
+				printf("Previous card was: %s of %s\n", cards[hand[currentCard - 1].value], suits[hand[currentCard - 1].suit]);
+			
+			printf("This is your card %d\n\n", currentCard + 1);
+			printf("Pick a suit!\n");
+			printf("1 - Clubs\n");
+			printf("2 - Diamonds\n");
+			printf("3 - Spades\n");
+			printf("4 - Hearts\n");
+			printf("5 - to go back\n\n");
+
+			printf("Enter choice: ");
+			scanf(" %d", &suitChoice);
+		} while (suitChoice > 5 || suitChoice < 1);
+
+		if (suitChoice != 5)
+		{
+			do
+			{
+				system("cls");
+
+				printf("Here are the available cards in suit...\n\n");
+				for (int i = 13 * (suitChoice - 1); i < 13 * (suitChoice); i++)
+					if (pickedCards[i] == 0)
+						printf("%2d - %s of %s\n", (i % 13) + 1, cards[i % 13], suits[suitChoice - 1]);
+					else
+						printf("%2d - Already Taken.\n", (i % 13) + 1);
+
+				do
+				{
+					printf("\n\nEnter choice: ");
+					scanf(" %d", &cardChoice);
+				} while (cardChoice < 1 || cardChoice > 13);
+		
+			} while (cardAlreadyDrawn(13 * (suitChoice - 1) + (cardChoice - 1), pickedCards));
+		
+			hand[currentCard].value = cardChoice - 1;
+			hand[currentCard].suit = suitChoice - 1;
+
+			currentCard++;
+		}
+	}
+
+	if (suitChoice != 5)
+		return true;
+	
+	return false;
 }
 
 // sort cards in indicated hand in descending order
@@ -124,13 +198,13 @@ void printCards(struct card hand[])
 
 //CATEGORY FUNCTIONS START HERE--------------------------------------------------------------------------------
 /*
-	valueCat -> returns 0 - 5 where
+	valueCat -> returns 0, 1, 2, 3, 6, 7 where
 	0 = nothing
-	1 = four of a kind
-	2 = one pair
+	1 = one pair
+	2 = two pairs
 	3 = three of a kind
-	4 = two pairs
-	5 = full house
+	6 = full house
+	7 = four of a kind
 */
 int valueCat(struct card userHand[])
 {
@@ -145,12 +219,15 @@ int valueCat(struct card userHand[])
 	for (int a = 0; a < 14; a++)
 	{
 		if (valueBool[a] == 2)
-			ret += 2;
+			ret += 1;
 		else if (valueBool[a] == 3)
 			ret += 3;
 		else if (valueBool[a] == 4)
-			ret += 1;
+			ret += 7;
 	}
+
+	if (ret == 4)
+		ret += 2;
 
 	return ret;
 }
@@ -195,74 +272,218 @@ bool royalFlushCat(struct card hand[])
 }
 
 	//SORTS CARDS BY CATEGORY
-void category(struct card userHand[])
+int category(struct card userHand[])
 {	
-	bool pair1 = false;								//two values
-	bool pair2 = false;								//two values, two values
-	bool three = false;								//three values
-	bool four = false;								//four values
 	bool straight = straightCat(userHand);			//consec values
 	bool flush = flushCat(userHand);				//same suit all
 	bool royalflush = royalFlushCat(userHand);		//royal
-	bool full = false;								//three and pair1 or pair2
-	
-	switch (valueCat(userHand)) 
-	{
-		case 1:
-			four = true;
-			break;
-		case 2:
-			pair1 = true;
-			break;
-		case 3:
-			three = true;
-			break;
-		case 4:
-			pair2 = true;
-			break;
-		case 5:
-			full = true;
-			break;
-	}
 	
 	if (royalflush)
+	{
 		printf("\nRoyal Flush\n");
+		return 9;
+	}
 	else if (flush && straight)
+	{
 		printf("\nStraight Flush\n");
-	else if (four)
+		return 8;
+	}
+	else if (valueCat(userHand) == 7)
+	{
 		printf("\nFour of a kind\n");
-	else if (full)
+		return 7;
+	}
+	else if (valueCat(userHand) == 6)
+	{
 		printf("\nFull House\n");
+		return 6;
+	}
 	else if (flush)
+	{
 		printf("\nFlush\n");
+		return 5;
+	}
 	else if (straight)
+	{
 		printf("\nStraight\n");
-	else if (three)
+		return 4;
+	}
+	else if (valueCat(userHand) == 3)
+	{
 		printf("\nThree of a kind\n");
-	else if (pair2)
+		return 3;
+	}
+	else if (valueCat(userHand) == 2)
+	{
 		printf("\nTwo pairs\n");
-	else if (pair1)
+		return 2;
+	}
+	else if (valueCat(userHand) == 1)
+	{
 		printf("\nOne pair\n");
+		return 1;
+	}
 	else
+	{
 		printf("\nNothing\n");
-	
-	return;
+		return 0;
+	}
 }
 //CATEGORY FUNCTIONS END HERE--------------------------------------------------------------------------------
 
+// version 2 of assignment where user is pit against computer
+void versionTwo(struct card userHand[], struct card compHand[])
+{
+	char answer;
+	do
+	{
+		for (int i = 0; i < 52; i++)
+			pickedCards[i] = 0;
+
+		system("cls");
+
+		drawCards(userHand, 5);
+		drawCards(compHand, 5);
+
+		sort(userHand, 5);
+		sort(compHand, 5);
+
+		printf("Your cards...\n");
+		printCards(userHand);
+		int userScore = category(userHand);
+
+		printf("\n");
+
+		printf("Opponent's cards...\n");
+		printCards(compHand);
+		int compScore = category(compHand);
+
+		printf("\n\n");
+
+		if (userScore > compScore)
+			printf("You win!!\n");
+		else if (userScore < compScore)
+			printf("You lose!!\n");
+		else
+			printf("It's a tie!\n");
+
+		printf("\nWould you like to try again? (y/n)\n");
+		scanf(" %c", &answer);
+	} while (tolower(answer) == 'y');
+}
+
+// function that draws random cards for player
+void optionOne(struct card userHand[])
+{
+	char answer;
+	do
+	{
+		for (int i = 0; i < 52; i++)
+			pickedCards[i] = 0;
+
+		system("cls");
+
+		drawCards(userHand, 5);
+
+		sort(userHand, 5);
+
+		printf("Your cards...\n");
+		printCards(userHand);
+		int userScore = category(userHand);
+
+		printf("\n\n");
+
+		printf("\nWould you like to try again? (y/n)\n");
+		scanf(" %c", &answer);
+	} while (tolower(answer) == 'y');
+}
+
+// function that lets the player choose their card
+void optionTwo(struct card userHand[])
+{
+	char answer;
+	do
+	{
+		for (int i = 0; i < 52; i++)
+			pickedCards[i] = 0;
+
+		if (!drawChoiceCard(userHand, 5))
+			break;
+
+		sort(userHand, 5);
+
+		system("cls");
+
+		printf("Your cards...\n");
+		printCards(userHand);
+		int userScore = category(userHand);
+
+		printf("\nWould you like to try again? (y/n)\n");
+		scanf(" %c", &answer);
+	} while (tolower(answer) == 'y');
+}
+
+
+// function that returns user choice regarding which version to play
+int showMenu(struct card hand1[], struct card hand2[])
+{
+	int userChoice;
+
+	while (true)
+	{
+		do
+		{
+			system("cls");
+
+			printf("Welcome to Poker! (not really)\n\n");
+			printf("What version would you like to play?\n");
+			printf("1 for Version 1 (Draw random cards or draw of your own choice)\n");
+			printf("2 for Version 2 (Game against computer's cards)\n");
+			printf("3 to exit.\n\n");
+
+			printf("Enter choice: ");
+			scanf(" %d", &userChoice);
+		} while (userChoice > 3 || userChoice < 1);
+
+		if (userChoice == 3)
+		{
+			printf("\n\nGoodbye!");
+			break;
+		}
+		else if (userChoice == 1)
+		{
+			int userChoice1;
+			do
+			{
+				system("cls");
+
+				printf("Please choose an option: \n");
+				printf("1 for random cards\n");
+				printf("2 for draw cards of choice\n");
+				printf("3 to go back\n\n");
+
+				printf("Enter choice: ");
+				scanf(" %d", &userChoice1);
+			} while (userChoice1 > 4 || userChoice1 < 1);
+
+			if (userChoice1 == 2)
+				optionTwo(hand1);
+			else if (userChoice1 == 1)
+				optionOne(hand1);
+			
+		}
+		else if (userChoice == 2)
+			versionTwo(hand1, hand2);
+	}
+}
+
+
 int main()
 {
-	system("cls");
-
 	struct card userHand[5];
+	struct card compHand[5];
 
-	drawCards(userHand, 5);
-
-	sort(userHand, 5);
-
-	printCards(userHand);
-	
-	category(userHand);
+	showMenu(userHand, compHand);
 	
 	return 0;
 }
