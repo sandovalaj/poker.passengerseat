@@ -91,10 +91,6 @@ bool drawChoiceCard(struct card hand[], int n)
 
 	while (currentCard < 5 && suitChoice != 5)
 	{
-
-		goto picksuit;
-
-		picksuit:
 		do
 		{
 			system("cls");
@@ -119,7 +115,6 @@ bool drawChoiceCard(struct card hand[], int n)
 			do
 			{
 				system("cls");
-				printf("Enter 0 to go back... \n");
 
 				printf("Here are the available cards in suit...\n\n");
 				for (int i = 13 * (suitChoice - 1); i < 13 * (suitChoice); i++)
@@ -132,14 +127,8 @@ bool drawChoiceCard(struct card hand[], int n)
 				{
 					printf("\n\nEnter choice: ");
 					scanf(" %d", &cardChoice);
-					
-					if (cardChoice == 0)
-						goto picksuit;
-
-				} while (cardChoice < 0 || cardChoice > 13);
+				} while (cardChoice < 1 || cardChoice > 13);
 		
-			
-
 			} while (cardAlreadyDrawn(13 * (suitChoice - 1) + (cardChoice - 1), pickedCards));
 		
 			hand[currentCard].value = cardChoice - 1;
