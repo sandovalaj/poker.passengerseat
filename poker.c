@@ -114,17 +114,17 @@ bool drawChoiceCard(struct card hand[], int n)
 		{
 			do
 			{
-				system("cls");
-
-				printf("Here are the available cards in suit...\n\n");
-				for (int i = 13 * (suitChoice - 1); i < 13 * (suitChoice); i++)
-					if (pickedCards[i] == 0)
-						printf("%2d - %s of %s\n", (i % 13) + 1, cards[i % 13], suits[suitChoice - 1]);
-					else
-						printf("%2d - Already Taken.\n", (i % 13) + 1);
-
 				do
 				{
+					system("cls");
+
+					printf("Here are the available cards in suit...\n\n");
+					for (int i = 13 * (suitChoice - 1); i < 13 * (suitChoice); i++)
+						if (pickedCards[i] == 0)
+							printf("%2d - %s of %s\n", (i % 13) + 1, cards[i % 13], suits[suitChoice - 1]);
+						else
+							printf("%2d - Already Taken.\n", (i % 13) + 1);
+
 					printf("\n\nEnter choice: ");
 					scanf(" %d", &cardChoice);
 				} while (cardChoice < 1 || cardChoice > 13);
