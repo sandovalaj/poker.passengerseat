@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #define NUMBER_OF_STOCK 10
+#define NUMBER_OF_SIZES 12
 
 struct shoes
 {
@@ -14,25 +15,37 @@ struct stockShoes
     int styleNo;
     float price;
     bool recorded;
-    struct shoes shoesBySize[11];   // since sizes are ranged 3 - 14
+    struct shoes shoesBySize[12];   // since sizes are ranged 3 - 14
 };
 
 // record of shoes in stock
 struct stockShoes stock[10];
 
-// reset purposes
-struct stockShoes reset;
+// ------------------------------- UTILITY FUNCTIONS -------------------------------------------//
 
 // assign records function
-void assignStart(struct stockShoes stock[], int n)
+void resetStock(struct stockShoes *stock)
 {
-    for (int i = 0; i <= n; i++)
-    {
-        stock[i].recorded = false;
+    stock->styleNo = 0;
+    stock->price = 0.0;
+    stock->recorded = false;
 
-        for (int j = 0; j < 11; j++)
-            stock[i].shoesBySize[j].size = j + 3;
+    for (int j = 0; j < NUMBER_OF_SIZES; j++)
+    {
+        stock->shoesBySize[j].size = j + 3;
+        stock->shoesBySize[j].noOfPairs = 0;
     }
+}
+
+// function that finds stock by style number
+// returns -1 if non-existent
+int findByStyle(struct stockShoes stock[], int style)
+{
+    for (int i = 0; i < NUMBER_OF_STOCK && stock[i].recorded; i++)
+        if (style == stock[i].styleNo)
+            return i;
+    
+    return -1;
 }
 
 // function that checks if there is already existing style number
@@ -53,7 +66,7 @@ bool checkExistingStyle(struct stockShoes stock[], int styleNumber)
 // different shoe sizes
 bool checkExistingPairs(struct stockShoes stock)
 {
-    for (int i = 0; i < 11; i++)
+    for (int i = 0; i < NUMBER_OF_SIZES; i++)
         if (stock.shoesBySize[i].noOfPairs != 0)
             return true;
     
@@ -71,73 +84,127 @@ int checkExistingStock(struct stockShoes stock[])
     return -1;
 }
 
-// print function that treats its second parameter either as stock index
-// or style number depending on the third boolean parameter
-// if true, n is stock index
-// if false, n is style number/code
-void printStock(struct stockShoes stock[], int n, bool isStock)
+// function that prints given stock parameter
+void printRecord(struct stockShoes stockToPrint)
 {
-    int index = n;
+    printf("Price        : %.2f\n", stockToPrint.price);
+    for (int i = 0; i < NUMBER_OF_SIZES; i++)
+    {
+        struct shoes temp = stockToPrint.shoesBySize[i];
 
-    if (!isStock)
-        for (int i = 0; i < NUMBER_OF_STOCK; i++)
-            if (stock[i].styleNo == n)
-            {
-               index = i;
-               break;
-            }
-    
-    printf("Shoe stock number: %2d\n", index);
-    printf("Shoe style number: %2d\n", stock[index].styleNo);
+        if (temp.noOfPairs != 0)
+            printf("Size %2d in stock: %3d\n", temp.size, temp.noOfPairs);
+    }
 }
 
-// function that changes record on stack either through stock or style
-// a collective function that changes price or number of items in stock on hand
-// depending on value of boolean isPrice
-// changes price if true, changes number if false
-void change(bool isPrice)
+// function that prints given stock parameter
+void printPairs(struct shoes sizesToPrint[])
 {
-    int userChoice;
-    int stockChoice;
-    do
+    for (int i = 0; i < NUMBER_OF_SIZES; i++)
     {
-        system("cls");
+        if (sizesToPrint[i].noOfPairs != 0)
+            printf("Size %2d in stock: %3d\n", sizesToPrint[i].size, sizesToPrint[i].noOfPairs);
+    }
+}
 
-        printf("Choose by...\n\n");
-        printf("1 - Stock Number\n");
-        printf("2 - Style Number\n");
-        printf("3 - go back\n\n\n");
+// function that changes price or item on hand
+void change(bool isPrice, int userChoice, int itemStock)
+{
+    float priceToChange;
+    int sizeToChange;
+    int newPairs;
 
-        printf("Enter choice: ");
-        scanf(" %d", &userChoice);
-    } while (userChoice < 1 || userChoice > 3);
+    system("cls");
 
-
-    if (userChoice == 1)
+    if (isPrice)
     {
-        do
+        if (userChoice == 1)
+            printf("Stock %d Price: %.2f\n", itemStock, stock[itemStock].price);
+        else
+            printf("Style %d Price: %.2f\n", itemStock, stock[itemStock].price);
+    }
+    else
+    {
+        if (userChoice == 1)
+            printPairs(stock[itemStock].shoesBySize);
+        else
+            printPairs(stock[findByStyle(stock, itemStock)].shoesBySize);
+    }
+
+    printf("\nEnter -1 to go back to main menu.\n");
+
+    if (isPrice)
+    {
+        printf("\n\nEnter new price: ");
+        scanf(" %f", &priceToChange);
+
+        int temp2 = (int) priceToChange;
+
+        if (temp2 == -1)
+            return;
+        else if (priceToChange < 0)
+            change(isPrice, userChoice, itemStock);
+        else
+        {
+            if (userChoice == 1)
+                stock[itemStock].price = priceToChange;
+            else
+                stock[findByStyle(stock, itemStock)].price = priceToChange;
+        }
+    }
+    else
+    {
+        printf("\n\nEnter size to change pairs: ");
+        scanf(" %d", &sizeToChange);
+
+        if (sizeToChange == -1)
+            return;
+        else if (sizeToChange < 3 || sizeToChange > 14)
+            change(isPrice, userChoice, itemStock);
+        else
         {
             system("cls");
 
-            printf("Stock is numbered 0 to %d\n\n", NUMBER_OF_STOCK - 1);
-            printf("Enter a stock number: ");
-            scanf(" %d", &stockChoice);
-        } while (stockChoice < 0 || stockChoice > 9);
+            if (userChoice == 1)
+                stock[itemStock].price = priceToChange;
+            else
+                stock[findByStyle(stock, itemStock)].price = priceToChange;
+
+            printf("\nEnter -1 to go back to main menu.\n");
+            printf("Enter -2 to go back.\n");
+
+            printf("Enter new number of pairs: ");
+            scanf(" %d", &newPairs);
+
+            if (newPairs == -1)
+                return;
+            else if (newPairs < 0 || newPairs == -2)
+                change(isPrice, userChoice, itemStock);
+            else
+            {
+                if (userChoice == 1)
+                    stock[itemStock].shoesBySize[sizeToChange].noOfPairs = newPairs;
+                else
+                    stock[findByStyle(stock, itemStock)].shoesBySize[sizeToChange].noOfPairs = newPairs;
+                
+                change(isPrice, userChoice, itemStock);
+            }
+        }
     }
 }
+
+// ----------------------------- END OF UTILITY FUNCTIONS --------------------------------------//
+
 
 // function that lets user enter a record on current stock
 void enterRecord()
 {
-    int userChoice;
-    int stockToInsert = checkExistingStock(stock);
-    int temp;
+    int userChoice, temp, stockToInsert = checkExistingStock(stock);
     float ftemp;
 
     bool styleFinished  = false;
     bool priceFinished  = false;
     bool sizeFinished   = false;
-    bool numberFinished = false;
 
     while (true)
     {
@@ -154,7 +221,7 @@ void enterRecord()
         if (priceFinished)
             printf("Shoe's current price: %.2f\n", stock[stockToInsert].price);
         if (sizeFinished || checkExistingPairs(stock[stockToInsert]))
-            for (int i = 0; i < 11; i++)
+            for (int i = 0; i < NUMBER_OF_SIZES; i++)
                 if (stock[stockToInsert].shoesBySize[i].noOfPairs != 0)
                     printf("Shoe size %2d's pairs: %d\n", i + 3, stock[stockToInsert].shoesBySize[i].noOfPairs);
         
@@ -235,7 +302,7 @@ void enterRecord()
                     }
                     else if (temp2 == -1)
                         break;
-                    else if (temp2 == -1)
+                    else if (temp2 == -2)
                         priceFinished = false;
                 }
                 else if (temp2 == -1)
@@ -251,21 +318,152 @@ void enterRecord()
     }
 
     if (!stock[stockToInsert].recorded)
-        stock[stockToInsert] = reset;
+        resetStock(&stock[stockToInsert]);
 }
 
-void displayRecord()
+// print function that treats its second parameter either as stock index
+// or style number depending on boolean parameter
+void displayRecord(struct stockShoes stock[], bool isStock, bool isAll)
 {
+    system("cls");
+    int temp, temp2;
 
+    if (isAll)
+    {
+        for (int i = 0; i < NUMBER_OF_STOCK && stock[i].recorded; i++)
+        {
+            printf("Stock Number : %2d\n", i);
+            printf("Style Number : %2d\n", stock[i].styleNo);
+            printRecord(stock[i]);
+            printf("\n\n");
+        }
+
+        printf("Enter 1 to go back to main menu.\n");
+        scanf(" %d", &temp);
+
+        if (temp != 1)
+            displayRecord(stock, isStock, isAll);
+    }
+    else if (isStock)
+    {
+        printf("Enter -1 to go back to main menu\n");
+        printf("These are current occupied stocks...\n\n");
+
+        for (int i = 0; i < NUMBER_OF_STOCK && stock[i].recorded; i++)
+            printf("Stock %d\n", i);
+        
+        printf("\n\n\n");
+        printf("Enter stock to print: ");
+        scanf(" %d", &temp);
+        
+        if (temp == -1)
+            return;
+        else if (temp < 0 || temp > 10 || !stock[temp].recorded)
+            displayRecord(stock, isStock, isAll);
+        else
+        {
+            do
+            {
+                system("cls");
+                printRecord(stock[temp]);
+
+                printf("\n\nEnter 1 to go back to main menu.\n");
+                scanf(" %d", &temp2);
+
+            } while (temp2 != 1);
+        }
+    }
+    else
+    {
+        printf("Enter -1 to go back to main menu.\n");
+        printf("These are current occupied styles...\n\n");
+
+        for (int i = 0; i < NUMBER_OF_STOCK && stock[i].recorded; i++)
+            printf("Style %d\n", stock[i].styleNo);
+        
+        printf("\n\n\n");
+        printf("Enter style to print: ");
+        scanf(" %d", &temp);
+        
+        if (temp == -1)
+            return;
+        else if (temp < 0 || temp > 50 || !checkExistingStyle(stock, temp))
+            displayRecord(stock, isStock, isAll);
+        else
+        {
+            do
+            {
+                system("cls");
+                printRecord(stock[findByStyle(stock, temp)]);
+
+                printf("\n\nEnter 1 to go back to main menu.\n");
+                scanf(" %d", &temp2);
+
+            } while (temp2 != 1);
+        }
+    }
+}
+
+// function that changes record on stack either through stock or style
+void changeByChoice(bool isPrice, int userChoice)
+{
+    int temp;
+    float temp2;
+
+    system("cls");
+
+    if (userChoice == 1)
+    {
+        printf("Enter -1 to go back to main menu.\n");
+        printf("These are current occupied stocks...\n\n");
+
+        for (int i = 0; i < NUMBER_OF_STOCK && stock[i].recorded; i++)
+            printf("Stock %d\n", i);
+        
+        printf("\n\n\n");
+        printf("Enter stock to change: ");
+        scanf(" %d", &temp);
+
+        if (temp == -1)
+            return;
+        else if (temp < 0 || temp > 10 || !stock[temp].recorded)
+            changeByChoice(isPrice, userChoice);
+        else
+            change(isPrice, userChoice, temp);
+    }
+
+    else if (userChoice == 2)
+    {
+        printf("Enter -1 to go back to main menu.\n");
+        printf("These are current occupied styles...\n\n");
+
+        for (int i = 0; i < NUMBER_OF_STOCK && stock[i].recorded; i++)
+            printf("Style %d\n", stock[i].styleNo);
+        
+        printf("\n\n\n");
+        printf("Enter style to change: ");
+        scanf(" %d", &temp);
+
+        if (temp == -1)
+            return;
+        if (temp < 0 || temp > 50 || !checkExistingStyle(stock, temp))
+            changeByChoice(isPrice, userChoice);
+        else
+            change(isPrice, userChoice, temp);
+    }
 }
 
 // menu function
 void inventory()
 {
     int userChoice;
+    int userChoice2;
+    bool isPrice = false;
 
     while (true)
     {
+        isPrice = false;
+
         do
         {
             system("cls");
@@ -289,6 +487,51 @@ void inventory()
         }
         else if (userChoice == 1)
             enterRecord();
+        else if (userChoice == 2)
+        {
+            do
+            {
+                system("cls");
+
+                printf("Do you wish to display by stock number or by style number?\n");
+                printf("1 - to display by stock number\n");
+                printf("2 - to display by style number\n");
+                printf("3 - to display all\n");
+                printf("4 - to go back to main menu.\n\n");
+
+                printf("Enter a choice: ");
+                scanf(" %d", &userChoice);
+            } while (userChoice < 1 || userChoice > 4);
+
+            if (userChoice == 1)
+                displayRecord(stock, true, false);
+            else if (userChoice == 2)
+                displayRecord(stock, false, false);
+            else if (userChoice == 3)
+                displayRecord(stock, false, true);
+        }
+        else if (userChoice == 3 || userChoice == 4)
+        {
+            do
+            {
+                system("cls");
+
+                printf("Do you wish to change by stock number or by style number?\n");
+                printf("1 - to change by stock number\n");
+                printf("2 - to change by style number\n");
+                printf("3 - to go back to main menu.\n\n");
+
+                printf("Enter a choice: ");
+                scanf(" %d", &userChoice2);
+            } while (userChoice2 < 1 || userChoice2 > 3);
+
+            if (userChoice2 == 3)
+                continue; 
+            if (userChoice == 3)
+                isPrice = true;
+            
+            changeByChoice(isPrice, userChoice2);
+        }
     }
     
 }
@@ -296,6 +539,8 @@ void inventory()
 // main program
 int main()
 {
-    assignStart(stock, NUMBER_OF_STOCK);
+    for (int i = 0; i < NUMBER_OF_STOCK; i++)
+        resetStock(&stock[i]);
+
     inventory();
 }
