@@ -189,13 +189,13 @@ void printCards(struct card hand[])
 
 //CATEGORY FUNCTIONS START HERE--------------------------------------------------------------------------------
 /*
-	valueCat -> returns 0 - 5 where
+	valueCat -> returns 0, 1, 2, 3, 6, 7 where
 	0 = nothing
-	1 = four of a kind
-	2 = one pair
+	1 = one pair
+	2 = two pairs
 	3 = three of a kind
-	4 = two pairs
-	5 = full house
+	6 = full house
+	7 = four of a kind
 */
 int valueCat(struct card userHand[])
 {
@@ -210,12 +210,15 @@ int valueCat(struct card userHand[])
 	for (int a = 0; a < 14; a++)
 	{
 		if (valueBool[a] == 2)
-			ret += 2;
+			ret += 1;
 		else if (valueBool[a] == 3)
 			ret += 3;
 		else if (valueBool[a] == 4)
-			ret += 1;
+			ret += 7;
 	}
+
+	if (ret == 4)
+		ret += 2;
 
 	return ret;
 }
