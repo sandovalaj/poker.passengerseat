@@ -56,7 +56,18 @@ void seat_input(char input[])
 	return;
 }
 
-bool inputChecker(char input[])
+bool validSeat(char input[])
+{
+	if (input[0] < 49 || input[0] > 53)
+		return false;
+	
+	if (toupper(input[1]) < 65 || toupper(input[1]) > 68)
+		return false;
+	
+	return true;
+}
+
+bool takenSeat(char input[])
 {
 	int row = (input[0] - '0') - 1;
 	int seatNum = toupper(input[1]) - 65;
@@ -69,7 +80,7 @@ bool inputChecker(char input[])
 	return true;
 }
 
-bool allChecker()
+bool allSeatsTaken()
 {
 	for (int a = 0; a < 5; a++)
 	{
@@ -90,50 +101,89 @@ int main()
 	struct_declaration();
 	
 	bool taken = false;
+	bool invalid = false;
 	
 	while (1)
 	{
-		printf("\033c");
-		print_seats();
+		printf("\033c"); ////system cls-----------
+		printf("Menu:\n1 - Enter seat\n2 - Exit\nUser Selection: ");
 		
-		if (allChecker())
+		int selection;
+		scanf("%d", &selection);
+		
+		if (selection == 2)
 		{
-			printf("All seats are taken.");
-			return 0;
-		}
-		
-		char input[5];
-		
-		if (taken)
-		{
-			printf("Seat is already occupied. Please enter another: ");
-		}
-		else
-		{
-			printf("Enter seat: ");
-		}
-		
-		scanf("%s", input);
-		
-		if (inputChecker(input))
-		{
-			taken = false;
+			printf("Are you sure you want to exit? y/n ");
+			char sure[2];
+			scanf("%s", sure);
 			
-			printf("\033c");
-			seat_input(input);
-			print_seats();
-			char again[5];
-			printf("Would you like to input another seat? y/n\t");
-			scanf("%s", again);
-			
-			if (tolower(again[0]) == 'n')
-			{
+			if (sure[0] == 'y')
 				return 0;
-			}
 		}
-		else
+		else if (!(selection < 1 || selection > 2))
 		{
-			taken = true;
+			while (1)
+			{
+				printf("\033c"); ////system cls-----------
+				print_seats();
+		
+				char input[5];
+		
+				if (taken)
+				{
+					printf("Seat is already occupied. Please enter another: ");
+				}
+				else if (invalid)
+				{
+					printf("Please enter a valid seat: ");
+				}
+				else
+				{
+					printf("Enter seat: ");
+				}
+		
+				scanf("%s", input);
+				
+				if (!validSeat(input))
+				{
+					invalid = true;
+					taken = false;
+				}
+				else if (takenSeat(input))
+				{
+					taken = false;
+					invalid = false;
+					
+					printf("\033c");
+					seat_input(input);
+					print_seats();
+					char again[5];
+					
+					if (allSeatsTaken())
+					{
+						printf("All seats are taken. Press 1 to back to main menu");
+						
+						int back;
+						scanf("%d", &back);
+						
+						if (back == 1)
+							break;
+					}
+				
+					printf("Would you like to input another seat? y/n\t");
+					scanf("%s", again);
+				
+					if (tolower(again[0]) == 'n')
+					{
+						break;
+					}
+				}
+				else if (!takenSeat(input))
+				{
+					taken = true;
+					invalid = false;
+				}
+			}
 		}
 	}
 	
