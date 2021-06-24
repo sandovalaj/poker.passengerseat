@@ -82,16 +82,19 @@ void drawCards(struct card hand[], int n)
     }
 }
 
-// void function that draws single card chosen out of whole deck
-void drawChoiceCard(struct card hand[], int n)
+// bool function that draws single card chosen out of whole deck
+bool drawChoiceCard(struct card hand[], int n)
 {
 	int currentCard = 0;
+	int suitChoice  = 0;
+	int cardChoice  = 0;
 
-	while (currentCard < 5)
+	while (currentCard < 5 && suitChoice != 5)
 	{
-		int suitChoice;
-		int cardChoice;
 
+		goto picksuit;
+
+		picksuit:
 		do
 		{
 			system("cls");
@@ -104,35 +107,52 @@ void drawChoiceCard(struct card hand[], int n)
 			printf("1 - Clubs\n");
 			printf("2 - Diamonds\n");
 			printf("3 - Spades\n");
-			printf("4 - Hearts\n\n");
+			printf("4 - Hearts\n");
+			printf("5 - to go back\n\n");
 
 			printf("Enter choice: ");
 			scanf(" %d", &suitChoice);
-		} while (suitChoice > 4 || suitChoice < 1);
+		} while (suitChoice > 5 || suitChoice < 1);
 
-		do
+		if (suitChoice != 5)
 		{
-			system("cls");
-
-			printf("Here are the available cards in suit...\n\n");
-			for (int i = 13 * (suitChoice - 1); i < 13 * (suitChoice); i++)
-				if (pickedCards[i] == 0)
-					printf("%d - %s of %s\n", (i % 13) + 1, cards[i % 13], suits[suitChoice - 1]);
-
 			do
 			{
-				printf("\n\nEnter choice: ");
-				scanf(" %d", &cardChoice);
-			} while (cardChoice < 1 || cardChoice > 13);
+				system("cls");
+				printf("Enter 0 to go back... \n");
+
+				printf("Here are the available cards in suit...\n\n");
+				for (int i = 13 * (suitChoice - 1); i < 13 * (suitChoice); i++)
+					if (pickedCards[i] == 0)
+						printf("%2d - %s of %s\n", (i % 13) + 1, cards[i % 13], suits[suitChoice - 1]);
+					else
+						printf("%2d - Already Taken.\n", (i % 13) + 1);
+
+				do
+				{
+					printf("\n\nEnter choice: ");
+					scanf(" %d", &cardChoice);
+					
+					if (cardChoice == 0)
+						goto picksuit;
+
+				} while (cardChoice < 0 || cardChoice > 13);
+		
 			
 
-		} while (cardAlreadyDrawn(13 * (suitChoice - 1) + (cardChoice - 1), pickedCards));
+			} while (cardAlreadyDrawn(13 * (suitChoice - 1) + (cardChoice - 1), pickedCards));
 		
-		hand[currentCard].value = cardChoice - 1;
-		hand[currentCard].suit = suitChoice - 1;
+			hand[currentCard].value = cardChoice - 1;
+			hand[currentCard].suit = suitChoice - 1;
 
-		currentCard++;
+			currentCard++;
+		}
 	}
+
+	if (suitChoice != 5)
+		return true;
+	
+	return false;
 }
 
 // sort cards in indicated hand in descending order
@@ -398,7 +418,8 @@ void optionTwo(struct card userHand[])
 		for (int i = 0; i < 52; i++)
 			pickedCards[i] = 0;
 
-		drawChoiceCard(userHand, 5);
+		if (!drawChoiceCard(userHand, 5))
+			break;
 
 		sort(userHand, 5);
 
