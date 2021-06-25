@@ -98,13 +98,12 @@ bool allSeatsTaken()
 
 int main()
 {
-	struct_declaration();
-	
-	bool taken = false;
-	bool invalid = false;
-	
 	while (1)
 	{
+		struct_declaration();
+		bool taken = false;
+		bool invalid = false;
+		
 		printf("\033c"); ////system cls-----------
 		printf("Menu:\n1 - Enter seat\n2 - Exit\nUser Selection: ");
 		
