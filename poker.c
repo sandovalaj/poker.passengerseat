@@ -252,7 +252,7 @@ void valueAssign(int indexMATRIX, int value)
 }
 
 //copies card matrix per suit and value to main matrix of drawn cards
-void cardMatrixUpdate(int indexMATRIX, int indexCM)
+void cardMatrixUpdate(int indexMATRIX, int indexCM, struct card hand[], int n, int colorMatrix[])
 {
 	int temp = 0;
 	
@@ -262,6 +262,14 @@ void cardMatrixUpdate(int indexMATRIX, int indexCM)
 		{
 			cardMatrix[a][indexCM + b] = MATRIX[indexMATRIX + a][b];
 			temp = indexCM + b;
+		}
+	}
+	
+	for (int a = 0; a < 11; a++)
+	{
+		if (hand[n].suit % 2 == 1)
+		{
+			colorMatrix[indexCM + a]++;
 		}
 	}
 	
@@ -275,6 +283,9 @@ void cardMatrixUpdate(int indexMATRIX, int indexCM)
 		
 void printCards(struct card hand[])
 {
+	//color markers
+	int colorMatrix[56] = {0};
+	
 	//prints cards in text form
 	for (int a = 0; a < 5; a++)
 	{
@@ -296,14 +307,24 @@ void printCards(struct card hand[])
 	for (int a = 0; a < 5; a++)
 	{
 		valueAssign(hand[a].suit * 7, hand[a].value);
-		cardMatrixUpdate(hand[a].suit * 7, (a * 10) + a);
+		cardMatrixUpdate(hand[a].suit * 7, (a * 10) + a, hand, a, colorMatrix);
 	}
 	
 	for (int a = 0; a < 7; a++)
 	{
 		for (int b = 0; b < 56; b++)
 		{
-			printf("%c", cardMatrix[a][b]);
+			if (colorMatrix[b] == 1)
+			{
+				printf("\033[1;31m");
+				printf("%c", cardMatrix[a][b]);
+				printf("\033[0m");
+			}
+			else
+			{
+				printf("%c", cardMatrix[a][b]);
+			}
+			
 		}
 	}
 	
