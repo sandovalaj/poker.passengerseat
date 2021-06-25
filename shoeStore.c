@@ -24,16 +24,16 @@ struct stockShoes stock[10];
 // ------------------------------- UTILITY FUNCTIONS -------------------------------------------//
 
 // assign records function
-void resetStock(struct stockShoes *stock)
+void resetStock(int index)
 {
-    stock->styleNo = 0;
-    stock->price = 0.0;
-    stock->recorded = false;
+    stock[index].styleNo = 0;
+    stock[index].price = 0.0;
+    stock[index].recorded = false;
 
     for (int j = 0; j < NUMBER_OF_SIZES; j++)
     {
-        stock->shoesBySize[j].size = j + 3;
-        stock->shoesBySize[j].noOfPairs = 0;
+        stock[index].shoesBySize[j].size = j + 3;
+        stock[index].shoesBySize[j].noOfPairs = 0;
     }
 }
 
@@ -119,9 +119,9 @@ void change(bool isPrice, int userChoice, int itemStock)
     if (isPrice)
     {
         if (userChoice == 1)
-            printf("Stock %d Price: %.2f\n", itemStock, stock[itemStock].price);
+            printf("Stock %d\nPrice: %.2f\n", itemStock, stock[itemStock].price);
         else
-            printf("Style %d Price: %.2f\n", itemStock, stock[itemStock].price);
+            printf("Style %d\nPrice: %.2f\n", itemStock, stock[findByStyle(stock, itemStock)].price);
     }
     else
     {
@@ -154,8 +154,21 @@ void change(bool isPrice, int userChoice, int itemStock)
     }
     else
     {
+
         printf("\n\nEnter size to change pairs: ");
         scanf(" %d", &sizeToChange);
+
+        system("cls");
+
+        if (userChoice == 1)
+            printPairs(stock[itemStock].shoesBySize);
+        else
+            printPairs(stock[findByStyle(stock, itemStock)].shoesBySize);
+
+        printf("\nEnter -1 to go back to main menu.\n");
+        printf("Enter -2 to go back.\n");
+
+        printf("\nSize to change: %d\n", sizeToChange);
 
         if (sizeToChange == -1)
             return;
@@ -163,16 +176,6 @@ void change(bool isPrice, int userChoice, int itemStock)
             change(isPrice, userChoice, itemStock);
         else
         {
-            system("cls");
-
-            if (userChoice == 1)
-                stock[itemStock].price = priceToChange;
-            else
-                stock[findByStyle(stock, itemStock)].price = priceToChange;
-
-            printf("\nEnter -1 to go back to main menu.\n");
-            printf("Enter -2 to go back.\n");
-
             printf("Enter new number of pairs: ");
             scanf(" %d", &newPairs);
 
@@ -183,9 +186,9 @@ void change(bool isPrice, int userChoice, int itemStock)
             else
             {
                 if (userChoice == 1)
-                    stock[itemStock].shoesBySize[sizeToChange].noOfPairs = newPairs;
+                    stock[itemStock].shoesBySize[sizeToChange - 3].noOfPairs = newPairs;
                 else
-                    stock[findByStyle(stock, itemStock)].shoesBySize[sizeToChange].noOfPairs = newPairs;
+                    stock[findByStyle(stock, itemStock)].shoesBySize[sizeToChange - 3].noOfPairs = newPairs;
                 
                 change(isPrice, userChoice, itemStock);
             }
@@ -318,12 +321,12 @@ void enterRecord()
     }
 
     if (!stock[stockToInsert].recorded)
-        resetStock(&stock[stockToInsert]);
+        resetStock(stockToInsert);
 }
 
 // print function that treats its second parameter either as stock index
 // or style number depending on boolean parameter
-void displayRecord(struct stockShoes stock[], bool isStock, bool isAll)
+void displayRecord(bool isStock, bool isAll)
 {
     system("cls");
     int temp, temp2;
@@ -342,7 +345,7 @@ void displayRecord(struct stockShoes stock[], bool isStock, bool isAll)
         scanf(" %d", &temp);
 
         if (temp != 1)
-            displayRecord(stock, isStock, isAll);
+            displayRecord(isStock, isAll);
     }
     else if (isStock)
     {
@@ -359,7 +362,7 @@ void displayRecord(struct stockShoes stock[], bool isStock, bool isAll)
         if (temp == -1)
             return;
         else if (temp < 0 || temp > 10 || !stock[temp].recorded)
-            displayRecord(stock, isStock, isAll);
+            displayRecord(isStock, isAll);
         else
         {
             do
@@ -388,7 +391,7 @@ void displayRecord(struct stockShoes stock[], bool isStock, bool isAll)
         if (temp == -1)
             return;
         else if (temp < 0 || temp > 50 || !checkExistingStyle(stock, temp))
-            displayRecord(stock, isStock, isAll);
+            displayRecord(isStock, isAll);
         else
         {
             do
@@ -504,11 +507,11 @@ void inventory()
             } while (userChoice < 1 || userChoice > 4);
 
             if (userChoice == 1)
-                displayRecord(stock, true, false);
+                displayRecord(true, false);
             else if (userChoice == 2)
-                displayRecord(stock, false, false);
+                displayRecord(false, false);
             else if (userChoice == 3)
-                displayRecord(stock, false, true);
+                displayRecord(false, true);
         }
         else if (userChoice == 3 || userChoice == 4)
         {
@@ -540,7 +543,7 @@ void inventory()
 int main()
 {
     for (int i = 0; i < NUMBER_OF_STOCK; i++)
-        resetStock(&stock[i]);
+        resetStock(i);
 
     inventory();
 }
