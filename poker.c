@@ -46,9 +46,11 @@ struct card
 	int suit;
 };
 
+//total (empty) matrix of drawn cards
 int cardMatrix[7][56];
 
-int MATRIX[28][11] = //0, 1, 2, 3 = clu, dia, spa, hea
+//ASCII matrix of card suits (clubs, diamonds, spades, hearts respectively)
+int MATRIX[28][11] = 
 {
 	{32, 95, 95, 95, 95, 95, 95, 95, 95, 32, 9},
 	{124, 32, 32, 32, 32, 32, 32, 65, 65, 124, 9},
@@ -208,9 +210,9 @@ void sort(struct card hand[], int n)
 	}
 }
 
-void valueAssign(int value)
+void valueAssign(int indexMATRIX, int value)
 {
-	//CHANGE VALUE SLOTS IN MATRICES TO CORRESPONDING VALUE
+	//changes value in card matrix to show corresponding/drawn value
 	int v[2] = {32, 32};
 	
 	if (value == 9)
@@ -233,28 +235,23 @@ void valueAssign(int value)
 	{
 		for (int a = 0; a < 2; a++)
 		{
-			for (int b = 0; b < 4; b++)
-			{
-				MATRIX[1 + (7 * b)][7 + a] = v[0 + a];
-				MATRIX[5 + (7 * b)][1 + a] = v[1 - a];
-			}
+			MATRIX[1 + indexMATRIX][7 + a] = v[0 + a];
+			MATRIX[5 + indexMATRIX][1 + a] = v[1 - a];
 		}
 	}
 	else
 	{
 		for (int a = 0; a < 2; a++)
 		{
-			for (int b = 0; b < 4; b++)
-			{
-				MATRIX[1 + (7 * b)][7 + a] = v[0 + a];
-				MATRIX[5 + (7 * b)][1 + a] = v[0 + a];
-			}
+			MATRIX[1 + indexMATRIX][7 + a] = v[0 + a];
+			MATRIX[5 + indexMATRIX][1 + a] = v[0 + a];
 		}
 	}
 
 	return;
 }
 
+//copies card matrix per suit and value to main matrix of drawn cards
 void cardMatrixUpdate(int indexMATRIX, int indexCM)
 {
 	int temp = 0;
@@ -270,16 +267,15 @@ void cardMatrixUpdate(int indexMATRIX, int indexCM)
 	
 	for (int a = 0; a < 7; a++)
 	{
-		//cardMatrix[a][53] = 32;
 		cardMatrix[a][55] = '\n';
 	}
 	
 	return;	
-}	//int n, int suit, int value
-		//nth card //suit //value
+}	
 		
 void printCards(struct card hand[])
 {
+	//prints cards in text form
 	for (int a = 0; a < 5; a++)
 	{
 		if (hand[a].value == 10)
@@ -296,9 +292,10 @@ void printCards(struct card hand[])
 		printf("%s\n", suits[hand[a].suit]);
 	}
 	
+	//prints cards in ascii form
 	for (int a = 0; a < 5; a++)
 	{
-		valueAssign(hand[a].value);
+		valueAssign(hand[a].suit * 7, hand[a].value);
 		cardMatrixUpdate(hand[a].suit * 7, (a * 10) + a);
 	}
 	
