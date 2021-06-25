@@ -46,6 +46,40 @@ struct card
 	int suit;
 };
 
+int cardMatrix[7][56];
+
+int MATRIX[28][11] = //0, 1, 2, 3 = clu, dia, spa, hea
+{
+	{32, 95, 95, 95, 95, 95, 95, 95, 95, 32, 9},
+	{124, 32, 32, 32, 32, 32, 32, 65, 65, 124, 9},
+	{124, 32 ,32, 32, 32, 95, 32, 32, 32, 124, 9},
+	{124, 32, 32, 32, 40, 42, 41, 32, 32, 124, 9},
+	{124, 32, 32, 40, 95, 42, 95, 41, 32, 124, 9},
+	{124, 65, 65, 32, 32, 124, 32, 32, 32, 124, 9},
+	{124, 95, 95, 95, 95, 95, 95, 95, 95, 124, 9},
+	{32, 95, 95, 95, 95, 95, 95, 95, 95, 32, 9},
+	{124, 32, 32, 32, 32, 32, 32, 65, 65, 124, 9},
+	{124, 32, 32, 32, 47, 92, 32, 32, 32, 124, 9},
+	{124, 32, 32, 47, 42, 42, 92, 32, 32, 124, 9},
+	{124, 32, 32, 92, 42, 42, 47, 32, 32, 124, 9},
+	{124, 65, 65, 32, 92, 47, 32, 32, 32, 124, 9},
+	{124, 95, 95, 95, 95, 95, 95, 95, 95, 124, 9},
+	{32, 95, 95, 95, 95, 95, 95, 95, 95, 32, 9},
+	{124, 32, 32, 32, 32, 32, 32, 65, 65, 124, 9},
+	{124, 32, 32, 32, 32, 88, 32, 32, 32, 124, 9},
+	{124, 32, 32, 32, 47, 42, 92, 32, 32, 124, 9},
+	{124, 32, 32, 40, 95, 42, 95, 41, 32, 124, 9},
+	{124, 65, 65, 32, 32, 124, 32, 32, 32, 124, 9},
+	{124, 95, 95, 95, 95, 95, 95, 95, 95, 124, 9},
+	{32, 95, 95, 95, 95, 95, 95, 95, 95, 32, 9},
+	{124, 32, 32, 32, 32, 32, 32, 65, 65, 124, 9},
+	{124, 32, 47, 32, 86, 32, 92, 32, 32, 124, 9},
+	{124, 32, 92, 42, 42, 42, 47, 32, 32, 124, 9},
+	{124, 32, 32, 92, 42, 47, 32, 32, 32, 124, 9},
+	{124, 65, 65, 32, 88, 32, 32, 32, 32, 124, 9},
+	{124, 95, 95, 95, 95, 95, 95, 95, 95, 124, 9}
+};
+
 // boolean function that checks if card passed has already been drawn
 // takes in value of card with respect to whole deck and checks if it is
 // already in pickedCards array,
@@ -174,8 +208,76 @@ void sort(struct card hand[], int n)
 	}
 }
 
-// void function that loops through card hand and prints
-// cards according to their value and suit
+void valueAssign(int value)
+{
+	//CHANGE VALUE SLOTS IN MATRICES TO CORRESPONDING VALUE
+	int v[2] = {32, 32};
+	
+	if (value == 9)
+	{
+		v[0] = '1';
+		v[1] = '0';
+	}
+	else if (value == 10)
+		v[0] = 'J';
+	else if (value == 11)
+		v[0] = 'Q';	
+	else if (value == 12)
+		v[0] = 'K';
+	else if (value == 0)
+		v[0] = 'A';
+	else
+		v[0] = value + '1';
+		
+	if (value != 9)
+	{
+		for (int a = 0; a < 2; a++)
+		{
+			for (int b = 0; b < 4; b++)
+			{
+				MATRIX[1 + (7 * b)][7 + a] = v[0 + a];
+				MATRIX[5 + (7 * b)][1 + a] = v[1 - a];
+			}
+		}
+	}
+	else
+	{
+		for (int a = 0; a < 2; a++)
+		{
+			for (int b = 0; b < 4; b++)
+			{
+				MATRIX[1 + (7 * b)][7 + a] = v[0 + a];
+				MATRIX[5 + (7 * b)][1 + a] = v[0 + a];
+			}
+		}
+	}
+
+	return;
+}
+
+void cardMatrixUpdate(int indexMATRIX, int indexCM)
+{
+	int temp = 0;
+	
+	for (int a = 0; a < 7; a++)
+	{
+		for (int b = 0; b < 11; b++)
+		{
+			cardMatrix[a][indexCM + b] = MATRIX[indexMATRIX + a][b];
+			temp = indexCM + b;
+		}
+	}
+	
+	for (int a = 0; a < 7; a++)
+	{
+		//cardMatrix[a][53] = 32;
+		cardMatrix[a][55] = '\n';
+	}
+	
+	return;	
+}	//int n, int suit, int value
+		//nth card //suit //value
+		
 void printCards(struct card hand[])
 {
 	for (int a = 0; a < 5; a++)
@@ -193,6 +295,21 @@ void printCards(struct card hand[])
 		
 		printf("%s\n", suits[hand[a].suit]);
 	}
+	
+	for (int a = 0; a < 5; a++)
+	{
+		valueAssign(hand[a].value);
+		cardMatrixUpdate(hand[a].suit * 7, (a * 10) + a);
+	}
+	
+	for (int a = 0; a < 7; a++)
+	{
+		for (int b = 0; b < 56; b++)
+		{
+			printf("%c", cardMatrix[a][b]);
+		}
+	}
+	
 	return;
 }
 
