@@ -209,6 +209,22 @@ void enterRecord()
     bool priceFinished  = false;
     bool sizeFinished   = false;
 
+    if (stockToInsert == -1)
+    {
+        while (true)
+        {
+            system("cls");
+
+            printf("All stocks are recorded. There's no more place available.\n\n\n");
+            printf("Enter 1 to go back to main menu.\n");
+            printf("Enter choice: ");
+            scanf(" %d", &temp);
+
+            if (temp == 1)
+                return;
+        }
+    }
+
     while (true)
     {
         system("cls");
