@@ -582,8 +582,23 @@ int showMenu(struct card hand1[], struct card hand2[])
 
 		if (userChoice == 3)
 		{
-			printf("\n\nGoodbye!");
-			break;
+			do
+            {
+                system("cls");
+
+                printf("Are you sure you want to exit?\n");
+                printf("1 - No\n");
+                printf("2 - Yes\n\n");
+
+                printf("Enter a choice: ");
+                scanf(" %d", &userChoice);
+            } while (userChoice < 1 || userChoice > 2);
+
+            if (userChoice == 2)
+            {
+                printf("\n\nHave a nice day!\n");
+                break;
+            }
 		}
 		else if (userChoice == 1)
 		{
