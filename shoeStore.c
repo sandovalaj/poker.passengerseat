@@ -501,8 +501,23 @@ void inventory()
 
         if (userChoice == 5)
         {
-            printf("\n\nHave a nice day!\n");
-            break;
+            do
+            {
+                system("cls");
+
+                printf("Are you sure you want to exit?\n");
+                printf("1 - No\n");
+                printf("2 - Yes\n\n\n");
+
+                printf("Enter a choice: ");
+                scanf(" %d", &userChoice2);
+            } while (userChoice2 < 1 || userChoice2 > 2);
+
+            if (userChoice2 == 2)
+            {
+                printf("\n\nHave a nice day!\n");
+                break;
+            }
         }
         else if (userChoice == 1)
             enterRecord();
